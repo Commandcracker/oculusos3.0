@@ -1,0 +1,47 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Lua
+        uses: leafo/gh-actions-lua@v9
+
+      - name: Install Illuaminate
+        run: |
+          test -d bin || mkdir bin
+          test -f bin/illuaminate || wget -q -Obin/illuaminate https://squiddev.cc/illuaminate/linux-x86-64/illuaminate
+          chmod +x bin/illuaminate
+
+      - name: Generate documentation
+        run: bin/illuaminate doc-gen
+
+      - name: Fix search index
+        run: |
+          sed -i 's/\/index.json/\/oculusos3.0\/index.json/g' _site/main.js
+          sed -i 's/href = `/href = `\/oculusos3.0/g' _site/main.js
+
+      - name: Minify source code
+        run: |
+          find src -type d -exec sh -c "mkdir -p _site/min\$(echo {} | awk '{print substr(\$0,4)}')" \;
+          find src -type f -exec sh -c "bin/illuaminate minify {} > _site/min\$(echo {} | awk '{print substr(\$0,4)}')" \;
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
+          commit_message: Build for

@@ -2,6 +2,10 @@ if _G.tracker then
     return false, "Tracker has already been loaded."
 end
 
+if not turtle then
+    return false, "Tracker can only be loaded on a turtle."
+end
+
 _G.tracker = {
     x      = 0,
     y      = 0,
@@ -9,7 +13,7 @@ _G.tracker = {
     facing = "north"
 }
 
-local filename = ".tracker.txt"
+local filename = "/etc/tracker.txt"
 
 local function loadFile()
     local file = fs.open(filename, "r")
