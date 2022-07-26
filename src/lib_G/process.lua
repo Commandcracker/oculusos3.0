@@ -7,8 +7,6 @@ function coroutine.create(f)
     local process = {}
 
     local function f_override(...)
-        print("fff")
-        print()
         process.status = coroutine.status(coroutine.running())
         process.name = math.random(1, 100)
         f(...)

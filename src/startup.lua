@@ -47,8 +47,9 @@ function completion.file(shell, text)
     return fs.complete(text, shell.dir(), true, false)
 end
 
-shell.setPath(shell.path() .. ":/bin")
 shell.setCompletionFunction("bin/cat.lua", completion.build(completion.file))
+
+shell.setPath(".:/bin" .. string.sub(shell.path(), 2))
 
 term.clear()
 term.setCursorPos(1, 1)
@@ -71,19 +72,14 @@ end
 term.clear()
 term.setCursorPos(1, 1)
 
-term.setTextColor(colors.green)
-term.write("Oculus OS 1.0b ")
-
-term.setTextColor(colors.lightGray)
-term.write("(")
-
-term.setTextColor(colors.orange)
-term.write(os.version())
-
-term.setTextColor(colors.lightGray)
-term.write(")")
-
-print()
-
 -- Enable STRG + T
 os.pullEvent = oldOsPullEvent
+
+shell.run("/bin/shell.lua")
+if term.isColour() then
+    term.setTextColour(colours.orange)
+end
+print("Goodbye")
+term.setTextColour(colours.white)
+sleep(1)
+os.shutdown()
